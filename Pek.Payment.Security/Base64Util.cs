@@ -1,4 +1,4 @@
-﻿namespace Pek.Payment.Security;
+﻿namespace DH.Payment.Security;
 
 public static class Base64Util
 {

@@ -1,26 +1,24 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
-namespace DH.Payment.Security
+namespace DH.Payment.Security;
+
+public static class MD5
 {
-    public static class MD5
+    public static string Compute(string data)
     {
-        public static string Compute(string data)
+        if (string.IsNullOrEmpty(data))
         {
-            if (string.IsNullOrEmpty(data))
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            throw new ArgumentNullException(nameof(data));
+        }
 
-            using (var md5 = System.Security.Cryptography.MD5.Create())
-            {
-                var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(data));
+        using (var md5 = System.Security.Cryptography.MD5.Create())
+        {
+            var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(data));
 #if NET5_0
-                return Convert.ToHexString(hash);
+            return Convert.ToHexString(hash);
 #else
-                return BitConverter.ToString(hash).Replace("-", "");
+            return BitConverter.ToString(hash).Replace("-", "");
 #endif
-            }
         }
     }
 }

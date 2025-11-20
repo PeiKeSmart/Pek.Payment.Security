@@ -1,124 +1,122 @@
-﻿using System;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace DH.Payment.Security
+namespace DH.Payment.Security;
+
+public static class AES
 {
-    public static class AES
+    public static string Encrypt(string data, string key, byte[] iv, CipherMode cipherMode, PaddingMode paddingMode)
     {
-        public static string Encrypt(string data, string key, byte[] iv, CipherMode cipherMode, PaddingMode paddingMode)
+        if (string.IsNullOrEmpty(data))
         {
-            if (string.IsNullOrEmpty(data))
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            if (iv == null)
-            {
-                throw new ArgumentNullException(nameof(iv));
-            }
-
-            using (var aes = Aes.Create())
-            {
-                aes.Key = Convert.FromBase64String(key);
-                aes.IV = iv;
-                aes.Mode = cipherMode;
-                aes.Padding = paddingMode;
-
-                using (var ctf = aes.CreateEncryptor())
-                {
-                    var content = Encoding.UTF8.GetBytes(data);
-                    return Convert.ToBase64String(ctf.TransformFinalBlock(content, 0, content.Length));
-                }
-            }
+            throw new ArgumentNullException(nameof(data));
         }
 
-        public static string Decrypt(string data, string key, byte[] iv, CipherMode cipherMode, PaddingMode paddingMode)
+        if (string.IsNullOrEmpty(key))
         {
-            if (string.IsNullOrEmpty(data))
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            if (iv == null)
-            {
-                throw new ArgumentNullException(nameof(iv));
-            }
-
-            using (var aes = Aes.Create())
-            {
-                aes.Key = Convert.FromBase64String(key);
-                aes.IV = iv;
-                aes.Mode = cipherMode;
-                aes.Padding = paddingMode;
-
-                using (var ctf = aes.CreateDecryptor())
-                {
-                    var content = Convert.FromBase64String(data);
-                    return Encoding.UTF8.GetString(ctf.TransformFinalBlock(content, 0, content.Length));
-                }
-            }
+            throw new ArgumentNullException(nameof(key));
         }
 
-        public static string Encrypt(string data, string key, CipherMode cipherMode, PaddingMode paddingMode)
+        if (iv == null)
         {
-            if (string.IsNullOrEmpty(data))
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            using (var aes = Aes.Create())
-            {
-                aes.Key = Encoding.UTF8.GetBytes(key);
-                aes.Mode = cipherMode;
-                aes.Padding = paddingMode;
-
-                using (var ctf = aes.CreateEncryptor())
-                {
-                    var content = Encoding.UTF8.GetBytes(data);
-                    return Convert.ToBase64String(ctf.TransformFinalBlock(content, 0, content.Length));
-                }
-            }
+            throw new ArgumentNullException(nameof(iv));
         }
 
-        public static string Decrypt(string data, string key, CipherMode cipherMode, PaddingMode paddingMode)
+        using (var aes = Aes.Create())
         {
-            if (string.IsNullOrEmpty(data))
+            aes.Key = Convert.FromBase64String(key);
+            aes.IV = iv;
+            aes.Mode = cipherMode;
+            aes.Padding = paddingMode;
+
+            using (var ctf = aes.CreateEncryptor())
             {
-                throw new ArgumentNullException(nameof(data));
+                var content = Encoding.UTF8.GetBytes(data);
+                return Convert.ToBase64String(ctf.TransformFinalBlock(content, 0, content.Length));
             }
+        }
+    }
 
-            if (string.IsNullOrEmpty(key))
+    public static string Decrypt(string data, string key, byte[] iv, CipherMode cipherMode, PaddingMode paddingMode)
+    {
+        if (string.IsNullOrEmpty(data))
+        {
+            throw new ArgumentNullException(nameof(data));
+        }
+
+        if (string.IsNullOrEmpty(key))
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+
+        if (iv == null)
+        {
+            throw new ArgumentNullException(nameof(iv));
+        }
+
+        using (var aes = Aes.Create())
+        {
+            aes.Key = Convert.FromBase64String(key);
+            aes.IV = iv;
+            aes.Mode = cipherMode;
+            aes.Padding = paddingMode;
+
+            using (var ctf = aes.CreateDecryptor())
             {
-                throw new ArgumentNullException(nameof(key));
+                var content = Convert.FromBase64String(data);
+                return Encoding.UTF8.GetString(ctf.TransformFinalBlock(content, 0, content.Length));
             }
+        }
+    }
 
-            using (var aes = Aes.Create())
+    public static string Encrypt(string data, string key, CipherMode cipherMode, PaddingMode paddingMode)
+    {
+        if (string.IsNullOrEmpty(data))
+        {
+            throw new ArgumentNullException(nameof(data));
+        }
+
+        if (string.IsNullOrEmpty(key))
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+
+        using (var aes = Aes.Create())
+        {
+            aes.Key = Encoding.UTF8.GetBytes(key);
+            aes.Mode = cipherMode;
+            aes.Padding = paddingMode;
+
+            using (var ctf = aes.CreateEncryptor())
             {
-                aes.Key = Encoding.UTF8.GetBytes(key);
-                aes.Mode = cipherMode;
-                aes.Padding = paddingMode;
+                var content = Encoding.UTF8.GetBytes(data);
+                return Convert.ToBase64String(ctf.TransformFinalBlock(content, 0, content.Length));
+            }
+        }
+    }
 
-                using (var ctf = aes.CreateDecryptor())
-                {
-                    var content = Convert.FromBase64String(data);
-                    return Encoding.UTF8.GetString(ctf.TransformFinalBlock(content, 0, content.Length));
-                }
+    public static string Decrypt(string data, string key, CipherMode cipherMode, PaddingMode paddingMode)
+    {
+        if (string.IsNullOrEmpty(data))
+        {
+            throw new ArgumentNullException(nameof(data));
+        }
+
+        if (string.IsNullOrEmpty(key))
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+
+        using (var aes = Aes.Create())
+        {
+            aes.Key = Encoding.UTF8.GetBytes(key);
+            aes.Mode = cipherMode;
+            aes.Padding = paddingMode;
+
+            using (var ctf = aes.CreateDecryptor())
+            {
+                var content = Convert.FromBase64String(data);
+                return Encoding.UTF8.GetString(ctf.TransformFinalBlock(content, 0, content.Length));
             }
         }
     }

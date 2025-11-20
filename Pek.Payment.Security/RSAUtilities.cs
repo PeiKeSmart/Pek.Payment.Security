@@ -1,149 +1,148 @@
-﻿using Org.BouncyCastle.Asn1;
+﻿using System.Security.Cryptography;
+
+using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
-using System;
-using System.Security.Cryptography;
 
-namespace DH.Payment.Security
+namespace DH.Payment.Security;
+
+public static class RSAUtilities
 {
-    public static class RSAUtilities
+    public static ICipherParameters GetKeyParameterFormPrivateKey(string privateKey)
     {
-        public static ICipherParameters GetKeyParameterFormPrivateKey(string privateKey)
+        if (string.IsNullOrEmpty(privateKey))
         {
-            if (string.IsNullOrEmpty(privateKey))
-            {
-                throw new ArgumentNullException(nameof(privateKey));
-            }
-
-            var keyStructure = RsaPrivateKeyStructure.GetInstance(Convert.FromBase64String(privateKey));
-            return new RsaPrivateCrtKeyParameters(keyStructure.Modulus, keyStructure.PublicExponent, keyStructure.PrivateExponent, keyStructure.Prime1, keyStructure.Prime2, keyStructure.Exponent1, keyStructure.Exponent2, keyStructure.Coefficient);
+            throw new ArgumentNullException(nameof(privateKey));
         }
 
-        public static ICipherParameters GetKeyParameterFormPublicKey(string publicKey)
-        {
-            if (string.IsNullOrEmpty(publicKey))
-            {
-                throw new ArgumentNullException(nameof(publicKey));
-            }
+        var keyStructure = RsaPrivateKeyStructure.GetInstance(Convert.FromBase64String(privateKey));
+        return new RsaPrivateCrtKeyParameters(keyStructure.Modulus, keyStructure.PublicExponent, keyStructure.PrivateExponent, keyStructure.Prime1, keyStructure.Prime2, keyStructure.Exponent1, keyStructure.Exponent2, keyStructure.Coefficient);
+    }
 
-            return PublicKeyFactory.CreateKey(Convert.FromBase64String(publicKey));
+    public static ICipherParameters GetKeyParameterFormPublicKey(string publicKey)
+    {
+        if (string.IsNullOrEmpty(publicKey))
+        {
+            throw new ArgumentNullException(nameof(publicKey));
         }
 
-        /// <summary>
-        /// -----BEGIN RSA PRIVATE KEY-----
-        /// ...
-        /// -----END RSA PRIVATE KEY-----
-        /// </summary>
-        /// <param name="privateKey"></param>
-        /// <returns></returns>
-        public static RSAParameters GetRSAParametersFormRsaPrivateKey(string privateKey)
-        {
-            if (string.IsNullOrEmpty(privateKey))
-            {
-                throw new ArgumentNullException(nameof(privateKey));
-            }
+        return PublicKeyFactory.CreateKey(Convert.FromBase64String(publicKey));
+    }
 
-            var key = RsaPrivateKeyStructure.GetInstance(Convert.FromBase64String(privateKey));
-            return new RSAParameters
-            {
-                D = key.PrivateExponent.ToByteArrayUnsigned(),
-                DP = key.Exponent1.ToByteArrayUnsigned(),
-                DQ = key.Exponent2.ToByteArrayUnsigned(),
-                Exponent = key.PublicExponent.ToByteArrayUnsigned(),
-                InverseQ = key.Coefficient.ToByteArrayUnsigned(),
-                Modulus = key.Modulus.ToByteArrayUnsigned(),
-                P = key.Prime1.ToByteArrayUnsigned(),
-                Q = key.Prime2.ToByteArrayUnsigned(),
-            };
+    /// <summary>
+    /// -----BEGIN RSA PRIVATE KEY-----
+    /// ...
+    /// -----END RSA PRIVATE KEY-----
+    /// </summary>
+    /// <param name="privateKey"></param>
+    /// <returns></returns>
+    public static RSAParameters GetRSAParametersFormRsaPrivateKey(string privateKey)
+    {
+        if (string.IsNullOrEmpty(privateKey))
+        {
+            throw new ArgumentNullException(nameof(privateKey));
         }
 
-        /// <summary>
-        /// -----BEGIN PUBLIC KEY-----
-        /// ...
-        /// -----END PUBLIC KEY-----
-        /// </summary>
-        /// <param name="publicKey"></param>
-        /// <returns></returns>
-        public static RSAParameters GetRSAParametersFormPublicKey(string publicKey)
+        var key = RsaPrivateKeyStructure.GetInstance(Convert.FromBase64String(privateKey));
+        return new RSAParameters
         {
-            if (string.IsNullOrEmpty(publicKey))
-            {
-                throw new ArgumentNullException(nameof(publicKey));
-            }
+            D = key.PrivateExponent.ToByteArrayUnsigned(),
+            DP = key.Exponent1.ToByteArrayUnsigned(),
+            DQ = key.Exponent2.ToByteArrayUnsigned(),
+            Exponent = key.PublicExponent.ToByteArrayUnsigned(),
+            InverseQ = key.Coefficient.ToByteArrayUnsigned(),
+            Modulus = key.Modulus.ToByteArrayUnsigned(),
+            P = key.Prime1.ToByteArrayUnsigned(),
+            Q = key.Prime2.ToByteArrayUnsigned(),
+        };
+    }
 
-            var key = (RsaKeyParameters)PublicKeyFactory.CreateKey(Convert.FromBase64String(publicKey));
-            return new RSAParameters
-            {
-                Modulus = key.Modulus.ToByteArrayUnsigned(),
-                Exponent = key.Exponent.ToByteArrayUnsigned()
-            };
+    /// <summary>
+    /// -----BEGIN PUBLIC KEY-----
+    /// ...
+    /// -----END PUBLIC KEY-----
+    /// </summary>
+    /// <param name="publicKey"></param>
+    /// <returns></returns>
+    public static RSAParameters GetRSAParametersFormPublicKey(string publicKey)
+    {
+        if (string.IsNullOrEmpty(publicKey))
+        {
+            throw new ArgumentNullException(nameof(publicKey));
         }
 
-        /// <summary>
-        /// -----BEGIN RSA PRIVATE KEY-----
-        /// ...
-        /// -----END RSA PRIVATE KEY-----
-        /// </summary>
-        /// <param name="privateKey"></param>
-        /// <returns></returns>
-        public static AsymmetricKeyParameter GetAsymmetricKeyParameterFormRsaPrivateKey(string privateKey)
+        var key = (RsaKeyParameters)PublicKeyFactory.CreateKey(Convert.FromBase64String(publicKey));
+        return new RSAParameters
         {
-            if (string.IsNullOrEmpty(privateKey))
-            {
-                throw new ArgumentNullException(nameof(privateKey));
-            }
+            Modulus = key.Modulus.ToByteArrayUnsigned(),
+            Exponent = key.Exponent.ToByteArrayUnsigned()
+        };
+    }
 
-            var key = RsaPrivateKeyStructure.GetInstance(Convert.FromBase64String(privateKey));
-            return new RsaPrivateCrtKeyParameters(key.Modulus, key.PublicExponent, key.PrivateExponent, key.Prime1, key.Prime2, key.Exponent1, key.Exponent2, key.Coefficient);
+    /// <summary>
+    /// -----BEGIN RSA PRIVATE KEY-----
+    /// ...
+    /// -----END RSA PRIVATE KEY-----
+    /// </summary>
+    /// <param name="privateKey"></param>
+    /// <returns></returns>
+    public static AsymmetricKeyParameter GetAsymmetricKeyParameterFormRsaPrivateKey(string privateKey)
+    {
+        if (string.IsNullOrEmpty(privateKey))
+        {
+            throw new ArgumentNullException(nameof(privateKey));
         }
 
-        /// <summary>
-        /// -----BEGIN PUBLIC KEY-----
-        /// ...
-        /// -----END PUBLIC KEY-----
-        /// </summary>
-        /// <param name="publicKey"></param>
-        /// <returns></returns>
-        public static AsymmetricKeyParameter GetAsymmetricKeyParameterFormPublicKey(string publicKey)
-        {
-            if (string.IsNullOrEmpty(publicKey))
-            {
-                throw new ArgumentNullException(nameof(publicKey));
-            }
+        var key = RsaPrivateKeyStructure.GetInstance(Convert.FromBase64String(privateKey));
+        return new RsaPrivateCrtKeyParameters(key.Modulus, key.PublicExponent, key.PrivateExponent, key.Prime1, key.Prime2, key.Exponent1, key.Exponent2, key.Coefficient);
+    }
 
-            return PublicKeyFactory.CreateKey(Convert.FromBase64String(publicKey));
+    /// <summary>
+    /// -----BEGIN PUBLIC KEY-----
+    /// ...
+    /// -----END PUBLIC KEY-----
+    /// </summary>
+    /// <param name="publicKey"></param>
+    /// <returns></returns>
+    public static AsymmetricKeyParameter GetAsymmetricKeyParameterFormPublicKey(string publicKey)
+    {
+        if (string.IsNullOrEmpty(publicKey))
+        {
+            throw new ArgumentNullException(nameof(publicKey));
         }
 
-        /// <summary>
-        /// -----BEGIN RSA PUBLIC KEY-----
-        /// ...
-        /// -----END RSA PUBLIC KEY-----
-        /// </summary>
-        /// <param name="publicKey"></param>
-        /// <returns></returns>
-        public static AsymmetricKeyParameter GetAsymmetricKeyParameterFormRsaPublicKey(string publicKey)
-        {
-            if (string.IsNullOrEmpty(publicKey))
-            {
-                throw new ArgumentNullException(nameof(publicKey));
-            }
+        return PublicKeyFactory.CreateKey(Convert.FromBase64String(publicKey));
+    }
 
-            var key = RsaPublicKeyStructure.GetInstance(Asn1Object.FromByteArray(Convert.FromBase64String(publicKey)));
-            return new RsaKeyParameters(false, key.Modulus, key.PublicExponent);
+    /// <summary>
+    /// -----BEGIN RSA PUBLIC KEY-----
+    /// ...
+    /// -----END RSA PUBLIC KEY-----
+    /// </summary>
+    /// <param name="publicKey"></param>
+    /// <returns></returns>
+    public static AsymmetricKeyParameter GetAsymmetricKeyParameterFormRsaPublicKey(string publicKey)
+    {
+        if (string.IsNullOrEmpty(publicKey))
+        {
+            throw new ArgumentNullException(nameof(publicKey));
         }
 
-        public static ICipherParameters GetPublicKeyParameterFormAsn1PublicKey(string publicKey)
-        {
-            if (string.IsNullOrEmpty(publicKey))
-            {
-                throw new ArgumentNullException(nameof(publicKey));
-            }
+        var key = RsaPublicKeyStructure.GetInstance(Asn1Object.FromByteArray(Convert.FromBase64String(publicKey)));
+        return new RsaKeyParameters(false, key.Modulus, key.PublicExponent);
+    }
 
-            var keyStructure = RsaPublicKeyStructure.GetInstance(Asn1Object.FromByteArray(Convert.FromBase64String(publicKey)));
-            return new RsaKeyParameters(false, keyStructure.Modulus, keyStructure.PublicExponent);
+    public static ICipherParameters GetPublicKeyParameterFormAsn1PublicKey(string publicKey)
+    {
+        if (string.IsNullOrEmpty(publicKey))
+        {
+            throw new ArgumentNullException(nameof(publicKey));
         }
+
+        var keyStructure = RsaPublicKeyStructure.GetInstance(Asn1Object.FromByteArray(Convert.FromBase64String(publicKey)));
+        return new RsaKeyParameters(false, keyStructure.Modulus, keyStructure.PublicExponent);
     }
 }

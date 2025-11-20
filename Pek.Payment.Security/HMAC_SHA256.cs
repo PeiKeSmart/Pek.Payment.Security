@@ -1,49 +1,47 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
-namespace DH.Payment.Security
+namespace DH.Payment.Security;
+
+public static class HMAC_SHA256
 {
-    public static class HMAC_SHA256
+    public static string Compute(string data, string key)
     {
-        public static string Compute(string data, string key)
+        if (string.IsNullOrEmpty(data))
         {
-            if (string.IsNullOrEmpty(data))
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            using (var hmacSha256 = new System.Security.Cryptography.HMACSHA256(Encoding.UTF8.GetBytes(key)))
-            {
-                var hash = hmacSha256.ComputeHash(Encoding.UTF8.GetBytes(data));
-#if NET5_0
-                return Convert.ToHexString(hash);
-#else
-                return BitConverter.ToString(hash).Replace("-", "");
-#endif
-            }
+            throw new ArgumentNullException(nameof(data));
         }
 
-        public static byte[] Compute(byte[] data, byte[] key)
+        if (string.IsNullOrEmpty(key))
         {
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            throw new ArgumentNullException(nameof(key));
+        }
 
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+        using (var hmacSha256 = new System.Security.Cryptography.HMACSHA256(Encoding.UTF8.GetBytes(key)))
+        {
+            var hash = hmacSha256.ComputeHash(Encoding.UTF8.GetBytes(data));
+#if NET5_0
+            return Convert.ToHexString(hash);
+#else
+            return BitConverter.ToString(hash).Replace("-", "");
+#endif
+        }
+    }
 
-            using (var hmacSha256 = new System.Security.Cryptography.HMACSHA256(key))
-            {
-                return hmacSha256.ComputeHash(data);
-            }
+    public static byte[] Compute(byte[] data, byte[] key)
+    {
+        if (data == null)
+        {
+            throw new ArgumentNullException(nameof(data));
+        }
+
+        if (key == null)
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+
+        using (var hmacSha256 = new System.Security.Cryptography.HMACSHA256(key))
+        {
+            return hmacSha256.ComputeHash(data);
         }
     }
 }

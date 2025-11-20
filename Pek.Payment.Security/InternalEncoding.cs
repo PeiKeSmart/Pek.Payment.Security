@@ -1,22 +1,21 @@
 ﻿using System.Text;
 
-namespace DH.Payment.Security
+namespace DH.Payment.Security;
+
+internal static class InternalEncoding
 {
-    internal static class InternalEncoding
+    static InternalEncoding()
     {
-        static InternalEncoding()
-        {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        }
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+    }
 
-        internal static Encoding GetEncoding(string name)
-        {
-            return Encoding.GetEncoding(name);
-        }
+    internal static Encoding GetEncoding(string name)
+    {
+        return Encoding.GetEncoding(name);
+    }
 
-        internal static Encoding GetEncoding(int codepage)
-        {
-            return Encoding.GetEncoding(codepage);
-        }
+    internal static Encoding GetEncoding(int codepage)
+    {
+        return Encoding.GetEncoding(codepage);
     }
 }
