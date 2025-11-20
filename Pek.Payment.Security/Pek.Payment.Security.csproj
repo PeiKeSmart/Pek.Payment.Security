@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <RootNamespace>Pek.Payment.Security</RootNamespace>
     <AssemblyTitle>支付安全处理类库</AssemblyTitle>
     <Description>DH框架服务库的支付安全处理类，参考https://github.com/essensoft/payment</Description>
